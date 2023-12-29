@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -10,25 +11,18 @@ import { Participant } from '../../components/participant';
 import { styles } from './styles';
 
 export function Home() {
-  const participants = [
-    'Ian',
-    'Amanda',
-    'Bruno',
-    'Titi',
-    'Julinho',
-    'Yuri',
-    'Gabriel',
-    'Titi 2',
-    'Julinho 2',
-    'Yuri 2',
-    'Gabriel 2',
-  ];
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [participantName, setParticipantName] = useState('');
 
   function handleParticipantAdd() {
-    if (participants.includes('Ian')) {
+    if (!participantName)
+      return Alert.alert('Não pode adicionar um participante sem nome');
+    if (participants.includes(participantName)) {
       return Alert.alert('Participante ja foi registrado');
     }
-    console.log('clicked');
+
+    setParticipants((prevState) => [...prevState, participantName]);
+    setParticipantName('');
   }
 
   function handleParticipantRemove(name: string) {
@@ -36,7 +30,14 @@ export function Home() {
       'Remover participante',
       `Deseja realmente remover o participante ${name}?`,
       [
-        { text: 'Sim', style: 'destructive' },
+        {
+          text: 'Sim',
+          style: 'destructive',
+          onPress: () =>
+            setParticipants((prevState) =>
+              prevState.filter((participantName) => name !== participantName)
+            ),
+        },
         { text: 'Não', style: 'cancel' },
       ]
     );
@@ -52,6 +53,8 @@ export function Home() {
           style={styles.input}
           placeholder="Nome do participante"
           placeholderTextColor="#6B6B6B"
+          onChangeText={setParticipantName}
+          value={participantName}
         />
 
         <TouchableOpacity style={styles.btn} onPress={handleParticipantAdd}>
